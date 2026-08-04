@@ -1,0 +1,12 @@
+numpy>=1.24
+scipy>=1.10
+librosa>=0.10
+pyworld>=0.3.4
+reedsolo>=1.7
+soundfile>=0.12
+cryptography>=41.0
+
+# System dependency (NOT pip-installable): espeak-ng
+#   Ubuntu/Debian:  sudo apt install espeak-ng
+#   macOS:          brew install espeak-ng
+#   Windows:        https://github.com/espeak-ng/espeak-ng/releases
