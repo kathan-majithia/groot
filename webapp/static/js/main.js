@@ -34,29 +34,29 @@
   let estimateTimer = null;
   let currentCap = null;
 
-  async function refreshEstimate() {
-    const chars = [...messageEl.value].length; // count code points, not UTF-16 units
-    const encrypted = encodePwToggle.checked;
-    try {
-      const res = await fetch(`/api/estimate?chars=${chars}&encrypted=${encrypted}`);
-      const data = await res.json();
-      currentCap = data.max_chars;
-      charCounter.textContent = `${chars} / ${data.max_chars} characters`;
-      charCounter.classList.toggle("is-over", chars > data.max_chars);
-      durationEstimate.textContent = chars > 0
-        ? `~${data.duration_seconds}s of audio`
-        : "~– s of audio";
-    } catch (err) {
-      durationEstimate.textContent = "";
-    }
-  }
+  // async function refreshEstimate() {
+  //   const chars = [...messageEl.value].length; // count code points, not UTF-16 units
+  //   const encrypted = encodePwToggle.checked;
+  //   try {
+  //     const res = await fetch(`/api/estimate?chars=${chars}&encrypted=${encrypted}`);
+  //     const data = await res.json();
+  //     currentCap = data.max_chars;
+  //     // charCounter.textContent = `${chars} / ${data.max_chars} characters`;
+  //     charCounter.classList.toggle("is-over", chars > data.max_chars);
+  //     durationEstimate.textContent = chars > 0
+  //       ? `~${data.duration_seconds}s of audio`
+  //       : "~– s of audio";
+  //   } catch (err) {
+  //     durationEstimate.textContent = "";
+  //   }
+  // }
 
-  function scheduleEstimate() {
-    clearTimeout(estimateTimer);
-    estimateTimer = setTimeout(refreshEstimate, 150);
-  }
+  // function scheduleEstimate() {
+  //   clearTimeout(estimateTimer);
+  //   estimateTimer = setTimeout(refreshEstimate, 150);
+  // }
 
-  messageEl.addEventListener("input", scheduleEstimate);
+  // messageEl.addEventListener("input", scheduleEstimate);
   encodePwToggle.addEventListener("change", () => {
     encodePwWrap.classList.toggle("is-hidden", !encodePwToggle.checked);
     if (encodePwToggle.checked) {
@@ -67,7 +67,7 @@
     scheduleEstimate();
   });
 
-  refreshEstimate();
+  // refreshEstimate();
 
   // ---- Encode: submit -----------------------------------------------------
   const encodeForm = document.getElementById("encode-form");
