@@ -32,7 +32,7 @@
   const encodePassword = document.getElementById("encode-password");
 
   let estimateTimer = null;
-  let currentCap = null;
+  // let currentCap = null;
 
   // async function refreshEstimate() {
   //   const chars = [...messageEl.value].length; // count code points, not UTF-16 units
@@ -103,10 +103,10 @@
       setError(encodeResult, "Write something for the voice to carry first.");
       return;
     }
-    if (currentCap !== null && [...text].length > currentCap) {
-      setError(encodeResult, `That message is too long for one breath of audio -- keep it under ${currentCap} characters.`);
-      return;
-    }
+    // if (currentCap !== null && [...text].length > currentCap) {
+    //   setError(encodeResult, `That message is too long for one breath of audio -- keep it under ${currentCap} characters.`);
+    //   return;
+    // }
 
     const password = encodePwToggle.checked ? encodePassword.value : "";
 
