@@ -135,12 +135,12 @@
           ${password ? '<span class="encrypted-badge">🔒 AES-256 locked</span>' : ""}
           <audio class="result-audio" controls src="${url}"></audio>
           <div class="result-actions">
-            <a class="ghost-btn" href="${url}" download="iamgroot_message.wav">
+            <a class="ghost-btn" href="${url}" download="iamgroot_message.mp3">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M7 1v8M7 9L4 6M7 9l3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M2 11.5v.5A1.5 1.5 0 0 0 3.5 13.5h7A1.5 1.5 0 0 0 12 12v-.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
               </svg>
-              Download .wav
+              Download .mp3
             </a>
           </div>
         </div>`;
@@ -198,7 +198,7 @@
   decodeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!selectedFile) {
-      setError(decodeResult, "Choose a .wav file to reveal first.");
+      setError(decodeResult, "Choose a .mp3 file to reveal first.");
       return;
     }
 

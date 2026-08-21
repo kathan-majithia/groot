@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IamGroot &mdash; hide a message in a voice</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+<link rel="icon" href="{{ url_for('static', filename='groot.png') }}" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,13 +16,14 @@
 
 <header class="site-head">
   <div class="brand">
-    <svg class="brand-mark" width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+    <!-- <svg class="brand-mark" width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
       <path d="M17 30 C17 22 17 16 17 10" stroke="var(--moss-bright)" stroke-width="2.4" stroke-linecap="round"/>
       <path d="M17 16 C13 13 10 13 7 15" stroke="var(--moss-bright)" stroke-width="2" stroke-linecap="round"/>
       <path d="M17 21 C21 18 24 18 27 20" stroke="var(--moss-bright)" stroke-width="2" stroke-linecap="round"/>
       <path d="M17 10 C15 6 15 4 16.5 2" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/>
       <circle cx="17" cy="9" r="3.6" fill="var(--amber)"/>
-    </svg>
+    </svg> -->
+    <img src="{{ url_for('static', filename='groot.png') }}" class="logo" alt="Logo">
     <div class="brand-text">
       <span class="brand-name">IamGroot</span>
       <span class="brand-sub">voice steganography</span>
@@ -36,8 +37,7 @@
   <section class="intro">
     <h1>Plant a message.<br>Hand someone a voice.</h1>
     <p>Every clip below is a genuine, one&#8209;of&#8209;a&#8209;kind &ldquo;I am Groot&rdquo; &mdash;
-       its pitch and loudness are the message, quietly. No file to keep,
-       no key on a server. Add a password and it's real AES&#8209;256
+      No file to keep, no key on a server. Add a password and it's real AES&#8209;256
        encryption too, not just a good hiding place.</p>
   </section>
 
@@ -98,14 +98,14 @@
   <section class="panel is-hidden" id="panel-decode">
     <form id="decode-form">
       <label class="field-label">Your voice clip</label>
-      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose a wav file">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose a mp3 file">
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
           <path d="M15 20V6M15 6l-5 5M15 6l5 5" stroke="var(--moss-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M5 22v2.5A2.5 2.5 0 0 0 7.5 27h15a2.5 2.5 0 0 0 2.5-2.5V22" stroke="var(--moss-bright)" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <p><strong>Drop a .wav here</strong> &mdash; or click to browse</p>
+        <p><strong>Drop a .mp3 here</strong> &mdash; or click to browse</p>
         <span class="dropzone-file" id="dropzone-filename"></span>
-        <input type="file" id="audio-input" accept=".wav,audio/wav" hidden>
+        <input type="file" id="audio-input" accept=".mp3,audio/mp3" hidden>
       </div>
 
       <div class="password-row">
@@ -133,7 +133,6 @@
 </main>
 
 <footer class="site-foot">
-  <p>Pitch and loudness carry the payload; Reed&#8209;Solomon repairs what compression breaks.
      Nothing is stored &mdash; not the message, not the password, not the audio.</p>
 </footer>
 

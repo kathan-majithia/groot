@@ -19,16 +19,16 @@ gets hidden. Wrong password -> decryption fails outright (GCM's built-in
 authentication tag rejects it), never garbled/partial text.
 
 Usage:
-    python lsb_steganography.py encode groot.wav "secret text" out.wav
-    python lsb_steganography.py encode groot.wav "secret text" out.wav mypassword
-    python lsb_steganography.py decode out.wav
-    python lsb_steganography.py decode out.wav mypassword
+    python groot.py encode "secret text" out.wav (Optional: password) (Optional: COVER.mp3)
+    python groot.py decode out.wav (mypassword)
 
 Requires: pip install cryptography
 """
 import os
 import sys
 import wave
+
+import struct
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -37,6 +37,8 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 SALT_LEN = 16
 NONCE_LEN = 12
 PBKDF2_ITERATIONS = 200_000
+
+ID3_HEADER_SIZE = 10
 
 
 # --------------------------------------------------------------------------
@@ -83,43 +85,56 @@ def _bits_to_bytes(bits: str) -> bytes:
 # --------------------------------------------------------------------------
 # Encode / decode
 # --------------------------------------------------------------------------
-def encode( message: str, output_path: str,cover_path: str = 'groot.wav', password: str = None) -> None:
-    audio = wave.open(cover_path, "rb")
-    frame_bytes = bytearray(audio.readframes(audio.getnframes()))
-    params = audio.getparams()
-    audio.close()
+def _mp3_data_start(raw: bytes) -> int:
+    """Skip ID3v2 tag if present, so we don't corrupt tag data."""
+    if raw[:3] == b"ID3":
+        size_bytes = raw[6:10]
+        # ID3v2 size is encoded as 4 synchsafe bytes (7 bits each)
+        size = 0
+        for b in size_bytes:
+            size = (size << 7) | (b & 0x7F)
+        return ID3_HEADER_SIZE + size
+    return 0
+
+def encode(message: str, output_path: str, password: str = None, cover_path: str = 'groot.mp3') -> None:
+    with open(cover_path, "rb") as f:
+        raw = bytearray(f.read())
+
+    start = _mp3_data_start(raw)
+    frame_bytes = raw  # work on whole buffer, but only touch bytes from `start` onward
 
     payload = message.encode("utf-8")
     if password:
         payload = _encrypt(payload, password)
-
-    header = len(payload).to_bytes(4, "big")  # self-describing length, no delimiter needed
+    header = len(payload).to_bytes(4, "big")
     bits = _bytes_to_bits(header + payload)
 
-    if len(bits) > len(frame_bytes):
+    available = len(frame_bytes) - start
+    if len(bits) > available:
         raise ValueError(
-            f"Message too long for this cover file: need {len(bits)} sample "
-            f"bytes, only {len(frame_bytes)} available. Use a longer cover "
-            f"clip or a shorter message."
+            f"Message too long for this cover file: need {len(bits)} bytes, "
+            f"only {available} available after the ID3 tag. Use a longer "
+            f"cover clip or a shorter message."
         )
 
     for i, bit in enumerate(bits):
-        frame_bytes[i] = (frame_bytes[i] & 0b11111110) | int(bit)
+        pos = start + i
+        frame_bytes[pos] = (frame_bytes[pos] & 0b11111110) | int(bit)
 
-    out = wave.open(output_path, "wb")
-    out.setparams(params)
-    out.writeframes(bytes(frame_bytes))
-    out.close()
+    with open(output_path, "wb") as out:
+        out.write(bytes(frame_bytes))
+
     print(f"Encoded -> {output_path}" + (" (password-protected)" if password else ""))
 
 
 def decode(stego_path: str, password: str = None) -> str:
-    audio = wave.open(stego_path, "rb")
-    frame_bytes = bytearray(audio.readframes(audio.getnframes()))
-    audio.close()
+    with open(stego_path, "rb") as f:
+        raw = bytearray(f.read())
+
+    start = _mp3_data_start(raw)
+    frame_bytes = raw[start:]
 
     all_bits = "".join(str(b & 1) for b in frame_bytes)
-
     header_bits = all_bits[:32]
     payload_len = int(header_bits, 2) if len(header_bits) == 32 else 0
     if payload_len <= 0 or payload_len > len(frame_bytes):
@@ -127,10 +142,8 @@ def decode(stego_path: str, password: str = None) -> str:
 
     payload_bits = all_bits[32: 32 + payload_len * 8]
     payload = _bits_to_bytes(payload_bits)
-
     if password:
         payload = _decrypt(payload, password)
-
     try:
         return payload.decode("utf-8", errors="strict")
     except UnicodeDecodeError:
@@ -148,14 +161,14 @@ if __name__ == "__main__":
     mode = sys.argv[1]
     if mode == "encode":
         if len(sys.argv) not in (5, 6):
-            print('Usage: python lsb_steganography.py encode cover.wav "text" out.wav [password]')
+            print('Usage: python groot.py encode "secret text" out.wav (Optional: password) (Optional: COVER.mp3)')
             sys.exit(1)
         cover, msg, out = sys.argv[2], sys.argv[3], sys.argv[4]
         pw = sys.argv[5] if len(sys.argv) == 6 else None
-        encode(cover, msg, out, password=pw)
+        encode(msg, out, pw,cover)
     elif mode == "decode":
         if len(sys.argv) not in (3, 4):
-            print("Usage: python lsb_steganography.py decode stego.wav [password]")
+            print("Usage: python groot.py decode out.wav (mypassword)")
             sys.exit(1)
         stego = sys.argv[2]
         pw = sys.argv[3] if len(sys.argv) == 4 else None

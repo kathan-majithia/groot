@@ -52,7 +52,7 @@ def api_encode():
 
     tmp_path = None
     try:
-        fd, tmp_path = tempfile.mkstemp(suffix=".wav")
+        fd, tmp_path = tempfile.mkstemp(suffix=".mp3")
         os.close(fd)
         encode(text, tmp_path, password=password)
         with open(tmp_path, "rb") as f:
@@ -66,9 +66,9 @@ def api_encode():
 
     return send_file(
         io.BytesIO(audio_bytes),
-        mimetype="audio/wav",
+        mimetype="audio/mp3",
         as_attachment=True,
-        download_name="iamgroot_message.wav",
+        download_name="iamgroot_message.mp3",
     )
 
 
@@ -108,4 +108,4 @@ if __name__ == "__main__":
     # change mid-request and restarts the server, killing whatever
     # encode/decode call was in flight. debug=True still gives you the
     # in-browser traceback on errors -- just without the flaky auto-reload.
-    app.run(debug=True, use_reloader=False, port=5000)
+    app.run(host="0.0.0.0", debug=False, use_reloader=False, port=5000)
